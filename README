@@ -17,27 +17,21 @@ communicating with OmniGraffle.  As there are two versions of
 OmniGraffle available, standard and professional, it takes the
 application name as a command-line argument.
 
-Two shell scripts are provided for simplifying the command line
-interface.  One is hard-coded to work with OmniGraffle standard, the
-other with OmniGraffle Professional.  Both have the same usage:
+A shell script is provided for simplifying the command line interface.
+It will try to automatically determine which version of OmniGraffle
+you have installed; this will only work if OmniGraffle is installed
+into /Applications.  If it is not, you can specify which version to
+use by setting the GRAFFLE_APP environment variable to either
+"OmniGraffle" or "OmniGraffle Professional".
 
-   graffle[-pro].sh [<format name>] <input file> <output file>
+The usage of the shell script is:
+
+   graffle.sh [<format name>] <input file> <output file>
 
 Both filenames are mandatory.  The format name is optional; the
 default is "pdf".  The list of acceptable format names is not
 well-documented in the OmniGraffle reference.  It seems that you can
 certainly use the list of choices in the "Format" field of
 OmniGraffle's export dialog box (e.g., "PNG bitmap image").  Shortcuts
-also seem to work — "pdf", "PDF", "eps", "EPS" have all been verified
+also seem to work -- "pdf", "PDF", "eps", "EPS" have all been verified
 (under OmniGraffle 4.x) to produce correct output.
-
-
-For Developers
---------------
-
-If you plan on modifying these scripts, please note that the
-graffle.sh and graffle-pro.sh files currently only differ in the
-application name that they pass to the AppleScript.  You must ensure
-that any changed you make to one shell script are merged into the
-other.  It might be worth changing things so that this duplication is
-not necessary.

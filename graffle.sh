@@ -14,6 +14,19 @@ else
     exit 1
 fi
 
+# Allow the user to specify the name of the OmniGraffle application in
+# the GRAFFLE_APP environment variable.  If it is not set, then we
+# must find a suitable default.  We determine this default by assuming
+# that OmniGraffle is installed in /Applications, and use the
+# Professional version if it exists.
+if [ "x${GRAFFLE_APP}" == "x" ]; then
+    if [ -x "/Applications/OmniGraffle Professional.app" ]; then
+        GRAFFLE_APP="OmniGraffle Professional"
+    else
+        GRAFFLE_APP="OmniGraffle"
+    fi
+fi
+
 if echo "$INPUT_FILE" | grep '^/'; then
     # The input filename starts with a slash, and is therefore an
     # absolute pathname.  There is no need to prepend $PWD.
@@ -38,8 +51,8 @@ fi
 
 DIR=`dirname $0`
 
-echo Format = $FORMAT
-echo Input = $INPUT_PATH
-echo Output = $OUTPUT_PATH
+#echo Format = $FORMAT
+#echo Input = $INPUT_PATH
+#echo Output = $OUTPUT_PATH
 
-osascript $DIR/graffle.scpt "OmniGraffle" "$FORMAT" "$INPUT_PATH" "$OUTPUT_PATH"
+osascript $DIR/graffle.scpt "${GRAFFLE_APP}" "$FORMAT" "$INPUT_PATH" "$OUTPUT_PATH"
