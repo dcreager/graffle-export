@@ -11,7 +11,7 @@ generate the necessary EPS and PDF versions of an OmniGraffle figure
 for incorporating into an automatic build system for a LaTeX document.
 
 The package consists of an AppleScript (graffle.scpt), which must be
-edited using Apple's Script Editor application, as is stored in a
+edited using Apple's Script Editor application, as it's stored in a
 binary format.  This AppleScript contains the integration logic for
 communicating with OmniGraffle.  As there are two versions of
 OmniGraffle available, standard and professional, it takes the

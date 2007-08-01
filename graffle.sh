@@ -20,12 +20,35 @@ fi
 # that OmniGraffle is installed in /Applications, and use the
 # Professional version if it exists.
 if [ "x${GRAFFLE_APP}" == "x" ]; then
-    if [ -x "/Applications/OmniGraffle Professional.app" ]; then
-        GRAFFLE_APP="OmniGraffle Professional"
-    else
-        GRAFFLE_APP="OmniGraffle"
+    APP=`ls -t /Applications | grep '^OmniGraffle Professional' | head -n 1`
+
+    if [ "x${APP}" == "x" ]; then
+        # Couldn't find a copy of OmniGraffle Pro.  Look for a copy of
+        # Standard.
+
+        APP=`ls -t /Applications | grep '^OmniGraffle' | head -n 1`
+
+        if [ "x${APP}" == "x" ]; then
+            # Couldn't find a copy of Standard, either.  That's an
+            # error!
+
+            echo <<EOF >&2
+Couldn't find a copy of OmniGraffle (Pro or Standard) in
+/Applications.  Please set the GRAFFLE_APP environment variable to the
+name of OmniGraffle's application file.
+EOF
+            exit 1
+        fi
     fi
+
+    # If we fall through to here, $APP contains the directory name of
+    # the OmniGraffle application.  We need to strip off the .app at
+    # the end to get the application name.
+
+    GRAFFLE_APP=`echo ${APP} | sed '/\.app$/s///'`
 fi
+
+echo $GRAFFLE_APP
 
 if echo "$INPUT_FILE" | grep '^/'; then
     # The input filename starts with a slash, and is therefore an
