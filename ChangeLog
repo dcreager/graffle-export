@@ -1,0 +1,19 @@
+Version 0.5 (01-Aug-2007):
+    * OmniGraffle's application name was changed between versions
+      4.1.2 and 4.2.  The export script now has better logic for
+      automatically finding the OmniGraffle application, regardless of
+      version.
+
+Version 0.4 (21-Feb-2006):
+    * Automatically determines which flavor of OmniGraffle is
+      installed.
+
+Version 0.3 (30-Jan-2006):
+    * Correctly handles absolute paths to OmniGraffle documents.
+
+Version 0.2 (20-Jan-2006):
+    * AppleScript will no longer close the OmniGraffle document if it
+      was already open when the export script was run.
+
+Version 0.1 (20-Jan-2006):
+    * Initial release
