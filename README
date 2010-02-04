@@ -28,10 +28,16 @@ The usage of the shell script is:
 
    graffle.sh [<format name>] <input file> <output file>
 
-Both filenames are mandatory.  The format name is optional; the
-default is "pdf".  The list of acceptable format names is not
-well-documented in the OmniGraffle reference.  It seems that you can
-certainly use the list of choices in the "Format" field of
-OmniGraffle's export dialog box (e.g., "PNG bitmap image").  Shortcuts
-also seem to work -- "pdf", "PDF", "eps", "EPS" have all been verified
-(under OmniGraffle 4.x) to produce correct output.
+Both filenames are mandatory.  The format name is optional.  The list
+of acceptable format names is not well-documented in the OmniGraffle
+reference.  In OmniGraffle 4, it seems that you can certainly use the
+list of choices in the "Format" field of OmniGraffle's export dialog
+box (e.g., "PNG bitmap image").  Shortcuts also seem to work -- "pdf",
+"PDF", "eps", "EPS" have all been verified (under OmniGraffle 4.x) to
+produce correct output.  Under OmniGraffle 5, several of these choices
+don't work — most notably, PDF.
+
+If you leave out <format name>, then OmniGraffle will try to guess the
+correct output format based on the extension of <output file>.  This
+seems to be more reliable than guessing which <format name> to use,
+and seems to work with both OmniGraffle 4 and 5.

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -eq 2 ]; then
-    FORMAT=pdf
+    FORMAT=""
     INPUT_FILE=$1
     OUTPUT_FILE=$2
 elif [ $# -eq 3 ]; then
