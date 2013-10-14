@@ -73,7 +73,8 @@ else:
     for infile in infiles:
         print "Converting ", infile , "..."
         inpath = path.join(input_dir,infile)
-        outpath = path.join(output_dir,infile)
+	outfile = infile.replace(".graffle",".%s" % format_type)
+        outpath = path.join(output_dir,outfile)
         to_shell(cwd,format_type,inpath,outpath)
 
 
