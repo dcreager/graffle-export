@@ -8,6 +8,10 @@ elif [ $# -eq 3 ]; then
     FORMAT=$1
     INPUT_FILE=$2
     OUTPUT_FILE=$3
+elif [ $# -eq 1 ]; then
+    FORMAT=""
+    INPUT_FILE=$1
+    OUTPUT_FILE=`echo ${INPUT_FILE} | sed 's/\.graffle$/.pdf/'`;
 else
     PROG=`basename $0`
     echo "Usage: $PROG [<format>] <graffle file> <outputfile>"
