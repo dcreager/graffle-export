@@ -1,81 +1,137 @@
 #!/bin/bash
 
-if [ $# -eq 2 ]; then
-    FORMAT=""
-    INPUT_FILE=$1
-    OUTPUT_FILE=$2
-elif [ $# -eq 3 ]; then
-    FORMAT=$1
-    INPUT_FILE=$2
-    OUTPUT_FILE=$3
-else
-    PROG=`basename $0`
-    echo "Usage: $PROG [<format>] <graffle file> <outputfile>"
+# help text
+usage="\
+Usage: $0 [<option>...] <input file> <output file>
+
+  Options:
+
+    Long option         Short option    Description
+    --canvas=NAME       -c NAME         Export selected canvas
+    --border=NUM        -b NUM          Number of pixels of border area
+    --size=NUM,NUM      -s NUM,NUM      Size of the manual export region
+    --scale=NUM         -a NUM          The scale to use during export
+    --resolution=NUM    -r NUM          Number of pixels per point (1.0 means 72 DPI)
+    --transparent       -t              Leave the background transparent during export
+    --include-border    -i              Include a border area
+    --no-quit           -n              Do not quit OmniGraffle after export
+    --help              -h              Print this text
+    --quit                              Quit OmniGraffle and exit
+"
+
+# options
+canvas_name=""
+border="10"
+size=""
+scale="1.0"
+resolution="1.0"
+transparent=false
+include_border=false
+quit_graffle=true
+
+dir=`dirname $0`
+
+if [[ $# == 1 ]] && [[ "$1" =~ "--help|-h" ]] ; then
+    echo "$usage" 1>&2
     exit 1
 fi
 
-# Allow the user to specify the name of the OmniGraffle application in
-# the GRAFFLE_APP environment variable.  If it is not set, then we
-# must find a suitable default.  We determine this default by assuming
-# that OmniGraffle is installed in /Applications, and use the
-# Professional version if it exists.
-if [ "x${GRAFFLE_APP}" == "x" ]; then
-    APP=`ls -t /Applications | grep '^OmniGraffle Professional' | head -n 1`
+if [[ $# == 1 ]] && [[ "$1" = "--quit" ]] ; then
+    osascript $dir/quit-graffle.applescript
+    exit 0
+fi
+# Parse arguments.
+while [ $# -gt 2 ]; do
+    case "$1" in
+        --*=*)
+            longopt=true
+            opt=`echo "$1" | sed 's/=[-_a-zA-Z0-9]*//'`
+            optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'`
+            shift
+            ;;
+        *)
+            longopt=false
+            opt="$1"
+            optarg="$2"
+            shift
+            shift
+            ;;
+    esac
 
-    if [ "x${APP}" == "x" ]; then
-        # Couldn't find a copy of OmniGraffle Pro.  Look for a copy of
-        # Standard.
-
-        APP=`ls -t /Applications | grep '^OmniGraffle' | head -n 1`
-
-        if [ "x${APP}" == "x" ]; then
-            # Couldn't find a copy of Standard, either.  That's an
-            # error!
-
-            echo <<EOF >&2
-Couldn't find a copy of OmniGraffle (Pro or Standard) in
-/Applications.  Please set the GRAFFLE_APP environment variable to the
-name of OmniGraffle's application file.
-EOF
+    case "$opt" in
+        --canvas=*|-c)
+            canvas_name="$optarg"
+            ;;
+        --border=*|-b)
+            border="$optarg"
+            ;;
+        --size=*|-s)
+            size="$optarg"
+            ;;
+        --scale=*|-a)
+            scale="$optarg"
+            ;;
+        --resolution=*|-r)
+            resolution="$optarg"
+            ;;
+        --transparent|-t)
+            transparent=true
+            ;;
+        --include-border|-i)
+            include_border=true
+            ;;
+        --no-quit|-n)
+            quit_graffle=false
+            ;;
+        --help|-h)
+            echo "$usage" 1>&2
             exit 1
-        fi
-    fi
+            ;;
+    esac
 
-    # If we fall through to here, $APP contains the directory name of
-    # the OmniGraffle application.  We need to strip off the .app at
-    # the end to get the application name.
+    # unshift optarg for all options without parameter
+    case "$opt" in
+        --transparent|-t|--include_border|-i|--no-quit|-n)
+            if [ $longopt = "false" ]; then
+                set -- "$optarg" "$@"
+            fi
+            ;;
+    esac
+done
 
-    GRAFFLE_APP=`echo ${APP} | sed '/\.app$/s///'`
+input_file="$1"
+output_file="$2"
+
+if [ -z "$input_file" -o -z "$output_file" ]; then
+    echo "$usage" 1>&2
+    exit 1
 fi
 
-echo $GRAFFLE_APP
+if [ ! -f "$input_file" ]; then
+    echo "input file does not exist"
+    echo "$usage" 1>&2
+    exit 1
+fi
 
-if echo "$INPUT_FILE" | grep '^/'; then
-    # The input filename starts with a slash, and is therefore an
-    # absolute pathname.  There is no need to prepend $PWD.
-    INPUT_PATH=$INPUT_FILE
-else
+if [ -f "$output_file" ]; then
+    echo "output file already exists"
+    echo "$usage" 1>&2
+    exit 1
+fi
+
+if [ ! "${input_file:0:1}" = "/" ] ; then
     # The input filename does not start with a slash, and is therefore
     # a relative pathname.  We need to prepend $PWD to get an absolute
     # path.
-    INPUT_PATH=$PWD/$INPUT_FILE
+    input_file="$PWD/$input_file"
 fi
 
-if echo "$OUTPUT_FILE" | grep '^/'; then
-    # The output filename starts with a slash, and is therefore an
-    # absolute pathname.  There is no need to prepend $PWD.
-    OUTPUT_PATH=$OUTPUT_FILE
-else
+if [ ! "${output_file:0:1}" = "/" ] ; then
     # The output filename does not start with a slash, and is
     # therefore a relative pathname.  We need to prepend $PWD to get
     # an absolute path.
-    OUTPUT_PATH=$PWD/$OUTPUT_FILE
+    output_file="$PWD/$output_file"
 fi
 
-DIR=`dirname $0`
+osascript $dir/graffle.applescript "$canvas_name" "$border" "$size" "$scale" "$resolution" "$transparent" "$include_border" "$input_file" "$output_file" "$quit_graffle"
 
-#echo Format = $FORMAT
-#echo Input = $INPUT_PATH
-#echo Output = $OUTPUT_PATH
-
-osascript $DIR/graffle.scpt "${GRAFFLE_APP}" "$FORMAT" "$INPUT_PATH" "$OUTPUT_PATH"
